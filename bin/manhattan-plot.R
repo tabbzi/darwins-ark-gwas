@@ -1,15 +1,19 @@
-library(svglite)
-library(tidyverse)
-library(data.table)
-library(ggtext)
-library(stringr)
-library(dplyr)
+require(tidyverse)
+require(ggtext)
+#require(ggman)
+#require(ggpubr)
+require(data.table)
+require(stringr)
+require(dplyr)
+require(svglite)
+require(colorspace)
 
 # arguments
 args <- commandArgs(trailingOnly=T)
 mlmaFile <- args[1]
 clumpFile <- args[2]
 title <- paste(readLines(args[3]), collapse=" ")
+pCutoff <- args[4]
 
 # load data
 data = read.table(mlmaFile,
@@ -17,7 +21,7 @@ data = read.table(mlmaFile,
                   col.names = c("chr","snp","pos","A1","A2","frq","b","se","p")) %>% as.data.table()
 
 clump = read.table(clumpFile,
-                  header = T) %>% as.data.table()
+                  header = T) %>% as.data.table() %>% filter(P<pCutoff)
 clumpSNPs = lapply(gsub("\\s*(\\([^()]*(?:(?1)[^()]*)*\\))",
                           "",
                           clump$SP2,
@@ -33,12 +37,12 @@ data = merge(data, data.clumps, by.x = "snp", by.y = "snps", all.x = T) %>% as.d
 data[snp %in% clump$SNP, top := snp]
 
 # prune insignificant SNPs at 10% from each CHR for plotting
-data.sig = data %>% subset(!is.na(index) | !is.na(top))
-data.not = data %>%
-  subset(p >= 1e-6 & is.na(index)) %>%
-  group_by(chr) %>%
-  sample_frac(0.10)
-data = bind_rows(data.sig,data.not) %>% as.data.table()
+# data.sig = data %>% subset(!is.na(index) | !is.na(top))
+# data.not = data %>%
+#   subset(p >= 1e-6 & is.na(index)) %>%
+#   group_by(chr) %>%
+#   sample_frac(0.10)
+# data = bind_rows(data.sig,data.not) %>% as.data.table()
 
 # add cumulative pos
 data$pos = as.numeric(data$pos)
@@ -63,6 +67,7 @@ ylim <- data.plot %>%
   pull(ylim)
 
 # set color, fill, shape, alpha
+data.plot = as.data.table(data.plot)
 data.plot[p >= sig.low & chr %% 2 == 0, color := "#707070"]
 data.plot[p >= sig.low & chr %% 2 != 0, color := "#8f8f8f"]
 data.plot[p >= sig.low, alpha := 0.75]
@@ -98,7 +103,7 @@ p = ggplot(data.plot %>% arrange(plot.group), aes(x = pos.cum,
   geom_hline(yintercept = -log10(sig.low), color = "grey40", linetype = "dotted") +
   geom_hline(yintercept = -log10(sig.high), color = "grey40", linetype = "dashed") +
   geom_point() +
-  scale_x_continuous(label = axis.set$chr, breaks = axis.set$center, expand = c(0,0)) +
+  scale_x_continuous(label = axis.set$chr, breaks = axis.set$center) +
   scale_y_continuous(expand = c(0,0), limits = c(0, ylim)) +
   scale_size_identity() +
   scale_color_identity() +
@@ -119,10 +124,44 @@ p = ggplot(data.plot %>% arrange(plot.group), aes(x = pos.cum,
   )
 
 # save full as png
-ggsave(filename = paste(mlmaFile, ".manhattan-plot_full_under-pruned-0.10.png", sep = ""),
+ggsave(filename = paste(mlmaFile, ".manhattan-plot.png", sep = ""),
        plot = p,
        device = "png",
        units = "in",
        dpi = 300,
        width = 4.75*2,
-       height = 1.5*2)
+       height = 2*2)
+
+# qq plot
+gg_qqplot <- function(ps, ci = 0.95) {
+  N  <- length(ps)
+  df <- data.frame(
+    observed = -log10(sort(ps)),
+    expected = -log10(ppoints(N)),
+    clower   = -log10(qbeta((1 - ci) / 2, 1:N, N - 1:N + 1)),
+    cupper   = -log10(qbeta((1 + ci) / 2, 1:N, N - 1:N + 1))
+  )
+  log10Pe <- expression(paste("Expected -log"[10], plain(P)))
+  log10Po <- expression(paste("Observed -log"[10], plain(P)))
+  ggplot(df) +
+    geom_point(aes(expected, observed), shape = 1, size = 3) +
+    geom_abline(intercept = 0, slope = 1, alpha = 0.5) +
+    geom_line(aes(expected, cupper), linetype = 2) +
+    geom_line(aes(expected, clower), linetype = 2) +
+    xlab(log10Pe) +
+    ylab(log10Po)
+}
+
+gg.qq = gg_qqplot(data$p) +
+  coord_fixed(ratio = 1) +
+  theme(axis.text=element_text(size=10,face="bold"), aspect.ratio=1, panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"),
+        plot.margin = unit(c(1,2,1,1), "lines"))
+
+ggsave(filename = paste(mlmaFile, ".qq-plot.png", sep = ""),
+       plot = gg.qq,
+       device = "png",
+       units = "in",
+       dpi = 300,
+       width = 4.75*2,
+       height = 4.75*2)
