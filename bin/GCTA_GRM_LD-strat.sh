@@ -42,3 +42,36 @@ $gcta --bfile ${DIR}'/geno/'${GENO} \
       --extract ${DIR}'/lds/'${GENO}'.score.ld.Q075-Q100.txt' \
       --out ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100'
 echo ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100' >> ${DIR}'/grm/'${GENO}'.score.ld.list.txt'
+
+# get indivs from rel cutoff from ${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}'.grm.id'
+$gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q000-Q025' \
+      --make-grm \
+      --autosome \
+      --autosome-num 38 \
+      --keep ${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}'.grm.id' \
+      --out ${DIR}'/grm/'${GENO}'.score.ld.Q000-Q025_rel-cutoff-'${RELCUT}
+echo ${DIR}'/grm/'${GENO}'.score.ld.Q000-Q025_rel-cutoff-'${RELCUT} > ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'list.txt'
+
+$gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q025-Q050' \
+      --make-grm \
+      --autosome \
+      --autosome-num 38 \
+      --keep ${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}'.grm.id' \
+      --out ${DIR}'/grm/'${GENO}'.score.ld.Q025-Q050_rel-cutoff-'${RELCUT}
+echo ${DIR}'/grm/'${GENO}'.score.ld.Q025-Q050_rel-cutoff-'${RELCUT} >> ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'list.txt'
+
+$gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q050-Q075' \
+      --make-grm \
+      --autosome \
+      --autosome-num 38 \
+      --keep ${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}'.grm.id' \
+      --out ${DIR}'/grm/'${GENO}'.score.ld.Q050-Q075_rel-cutoff-'${RELCUT}
+echo ${DIR}'/grm/'${GENO}'.score.ld.Q050-Q075_rel-cutoff-'${RELCUT} >> ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'list.txt'
+
+$gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100' \
+      --make-grm \
+      --autosome \
+      --autosome-num 38 \
+      --keep ${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}'.grm.id' \
+      --out ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100_rel-cutoff-'${RELCUT}
+echo ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100_rel-cutoff-'${RELCUT} >> ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'list.txt'
