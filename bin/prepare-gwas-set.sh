@@ -40,3 +40,8 @@ qsub -q broad \
      -N ${GENO}'_GRM_LD-strat' \
      -v DIR=${DIR},GENO=${GENO} \
      ${DIR}/bin/GCTA_GRM_LD-strat.sh
+
+# submit job to annotate variant effects using SnpEff
+qsub -v GENO=${GENO} ${DIR}/bin/snpEff.sh
+
+# submit job to estimate taggings for genetic correlations using LDAK

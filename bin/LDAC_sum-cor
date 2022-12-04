@@ -1,0 +1,1 @@
+ /seq/vgb/software/ldak/ldak5.2.linux --tagfile tag/DarwinsArk_gp-0.70_biallelic-snps_maf-0.02_geno-0.05_hwe-1e-20-midp-keep-fewhet_N-3104.tagging --summary cor/fa.04.sumstats.tsv --summary2 cor/fa.15.sumstats.tsv --sum-cors cor/fa.04_vs_fa.05 --fixed-n 3104 --fixed-n2 3104 --check-sums NO --allow-ambiguous YES

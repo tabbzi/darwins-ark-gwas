@@ -308,5 +308,5 @@ if [ ${PLOT} == T ]; then
   # use Anaconda
   PATH=$PATH:/seq/vgb/software/anaconda3/current
   source activate /seq/vgb/dd/gwas/env/Renv
-  Rscript ${DIR}'/bin/manhattan-plot.R' ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma' ${DIR}'/clump/'${DATE}'/'${OUTPUT}'_p-'${p}'_kb-'${KB}'_r2-'${Rsq}'.loco.clumped' <(echo "${PHE}") 5e-8
+  Rscript ${DIR}'/bin/manhattan-plot.R' ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma' ${DIR}'/clump/'${DATE}'/'${OUTPUT}'_p-'${p}'_kb-'${KB}'_r2-'${Rsq}'.loco.clumped' <(echo "${PHE}")
 fi
