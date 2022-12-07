@@ -50,7 +50,7 @@ $gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q000-Q025' \
       --autosome-num 38 \
       --keep ${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}'.grm.id' \
       --out ${DIR}'/grm/'${GENO}'.score.ld.Q000-Q025_rel-cutoff-'${RELCUT}
-echo ${DIR}'/grm/'${GENO}'.score.ld.Q000-Q025_rel-cutoff-'${RELCUT} > ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'list.txt'
+echo ${DIR}'/grm/'${GENO}'.score.ld.Q000-Q025_rel-cutoff-'${RELCUT} > ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'.list.txt'
 
 $gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q025-Q050' \
       --make-grm \
@@ -58,7 +58,7 @@ $gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q025-Q050' \
       --autosome-num 38 \
       --keep ${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}'.grm.id' \
       --out ${DIR}'/grm/'${GENO}'.score.ld.Q025-Q050_rel-cutoff-'${RELCUT}
-echo ${DIR}'/grm/'${GENO}'.score.ld.Q025-Q050_rel-cutoff-'${RELCUT} >> ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'list.txt'
+echo ${DIR}'/grm/'${GENO}'.score.ld.Q025-Q050_rel-cutoff-'${RELCUT} >> ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'.list.txt'
 
 $gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q050-Q075' \
       --make-grm \
@@ -66,7 +66,7 @@ $gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q050-Q075' \
       --autosome-num 38 \
       --keep ${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}'.grm.id' \
       --out ${DIR}'/grm/'${GENO}'.score.ld.Q050-Q075_rel-cutoff-'${RELCUT}
-echo ${DIR}'/grm/'${GENO}'.score.ld.Q050-Q075_rel-cutoff-'${RELCUT} >> ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'list.txt'
+echo ${DIR}'/grm/'${GENO}'.score.ld.Q050-Q075_rel-cutoff-'${RELCUT} >> ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'.list.txt'
 
 $gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100' \
       --make-grm \
@@ -74,4 +74,4 @@ $gcta --grm ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100' \
       --autosome-num 38 \
       --keep ${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}'.grm.id' \
       --out ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100_rel-cutoff-'${RELCUT}
-echo ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100_rel-cutoff-'${RELCUT} >> ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'list.txt'
+echo ${DIR}'/grm/'${GENO}'.score.ld.Q075-Q100_rel-cutoff-'${RELCUT} >> ${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'.list.txt'
