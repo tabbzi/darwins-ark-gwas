@@ -107,6 +107,7 @@ else
   echo "Covariates fitted together with SNP in association tests." >> ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.info.txt'
 fi
 echo "# dogs included in analysis:" >> ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.info.txt'
+
 if [ ${useQCOV} == T ] ; then
   grep -wf <(grep -wf <(awk '$3!="NA" {print $1,$2}' ${DCOVFILE}) <(awk '$3!="NA" {print $1,$2}' ${QCOVFILE})) <(awk '$3!="NA" {print $1,$2}' ${PHEFILE}) | wc -l >> ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.info.txt'
 else

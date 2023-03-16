@@ -1,7 +1,7 @@
 #!/bin/bash
 #$ -q broad
-#$ -l h_vmem=20g
-#$ -l h_rt=24:00:00
+#$ -l h_vmem=4g
+#$ -l h_rt=1:00:00
 #$ -o /seq/vgb/dd/gwas/logs/
 #$ -e /seq/vgb/dd/gwas/logs/
 #$ -M kmorrill@broadinstitute.org
@@ -36,6 +36,11 @@ GENO=${GENO:-'DarwinsArk_gp-0.70_biallelic-snps_maf-0.001_geno-0.05_hwe-1e-20-mi
 ANNODIR=${ANNODIR:-${DIR}'/magma/anno/'${DATE}}
 ANNO=${ANNO:-'magma.orthologous.map.genes'}
 ANNOFILE=${ANNOFILE:-${ANNODIR}'/'${GENO}'_'${ANNO}'.genes.annot'}
+
+# sets:
+SETDIR=${SETDIR:-${DIR}'/magma/sets'}
+SET=${SET:-'gtex.set'}
+SETFILE=${SETFILE:-${SETDIR}'/'${SET}}
 
 # phenotypes:
 PHEDIR=${PHEDIR:-${DIR}'/pheno/'${DATE}}
@@ -93,9 +98,7 @@ n=`grep ^"n" ${DIR}'/reml/'${DATE}'/'${OUTPUT}'.REML.'*'.hsq' | awk '{print $2}'
 echo -e "SNP\tA1\tA2\tfreq\tBETA\tSE\tP\tN" > ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma.ma'
 tail -n+2 ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma' | awk -F "\t" '$8!="inf"{print $0}' | awk -v n=${n} -F "\t" 'OFS=FS {print $2,$4,$5,$6,$7,$8,$9,n}' >> ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma.ma'
 
-# GENE / REGION BASED
-${magma} --bfile ${DIR}'/geno/'${GENO} \
-         --pval ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma.ma' N=${n} \
-         --gene-annot ${ANNOFILE} \
-         --out ${DIR}'/magma/'${DATE}'/'${OUTPUT}'.'${ANNO} \
-         --gene-settings fixed-permp=5000
+# SET BASED
+${magma} --gene-results ${DIR}'/magma/'${DATE}'/'${OUTPUT}'.'${ANNO}'.genes.raw' \
+         --set-annot ${SETFILE} \
+         --out ${DIR}'/magma/'${DATE}'/'${OUTPUT}'.'${ANNO}'.'${SET}

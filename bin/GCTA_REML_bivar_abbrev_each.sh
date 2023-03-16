@@ -6,6 +6,11 @@
 #$ -e /seq/vgb/dd/gwas/logs/
 #$ -M kmorrill@broadinstitute.org
 #$ -m e
+
+# Author: Kathleen Morrill
+# Purpose: 
+
+
 source /broad/software/scripts/useuse
 umask 002
 

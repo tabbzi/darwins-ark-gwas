@@ -1,11 +1,14 @@
 #!/bin/bash
 #$ -q broad
 #$ -l h_vmem=20g
-#$ -l h_rt=24:00:00
+#$ -l h_rt=2:00:00
 #$ -o /seq/vgb/dd/gwas/logs/
 #$ -e /seq/vgb/dd/gwas/logs/
 #$ -M kmorrill@broadinstitute.org
 #$ -m e
+#$ -pe smp 4
+#$ -binding linear:4
+#$ -R y
 source /broad/software/scripts/useuse
 umask 002
 
@@ -13,11 +16,17 @@ use GCC-5.2
 use .htslib-1.8
 use R-3.5
 use BEDTools
+use Parallel
+
+set -a
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DIR}/env/
 
 # software:
-magma=/seq/vgb/software/magma/current
+gemma=/seq/vgb/software/gemma/current
+gcta=/seq/vgb/software/gcta/current
+plink=/seq/vgb/software/plink2/current/plink
+plink2=/seq/vgb/software/plink2/dev
 
 # prepare:
 DIR='/seq/vgb/dd/gwas'
@@ -27,26 +36,21 @@ if [ ${DATE} == "NA" ] ; then
   echo "Setting date to current date ${DATE}"
 fi
 
-mkdir ${DIR}'/magma/'${DATE}
+SCRIPT=${DIR}'/bin/GCTA_REML_bivar_efficient_parallel_run.sh'
+
+mkdir ${DIR}'/cor/'${DATE}
 
 # genetic dataset:
 GENO=${GENO:-'DarwinsArk_gp-0.70_biallelic-snps_maf-0.001_geno-0.05_hwe-1e-20-midp-keep-fewhet_N-3465'}
 
-# tests:
-ANNODIR=${ANNODIR:-${DIR}'/magma/anno/'${DATE}}
-ANNO=${ANNO:-'magma.orthologous.map.genes'}
-ANNOFILE=${ANNOFILE:-${ANNODIR}'/'${GENO}'_'${ANNO}'.genes.annot'}
-
 # phenotypes:
 PHEDIR=${PHEDIR:-${DIR}'/pheno/'${DATE}}
-PHE=${PHE:-'fa.01-filled-by-mean'}
+PHE=${PHE:-'all'}
 PHEFILE=${PHEFILE:-${PHEDIR}'/'${PHE}'.tsv'}
-PN=${PN:-'1'}
 
-# environmental factors:
-#GXEDIR=${GXEDIR:-${DIR}'/covar'/${DATE}}
-#GXE=${GXE:-'sex.psychmed'}
-#GXEFILE=${GXEFILE:-${GXEDIR}'/'${GXE}'.tsv'}
+# selections:
+KEY=${KEY:-${PHEDIR}'/'${PHE}'.key.txt'}
+PAIRS=${PAIRS:-${PHEDIR}'/'${PHE}'.pairs.tsv'}
 
 # discrete covariates:
 DCOVDIR=${DCOVDIR:-${DIR}'/covar/'${DATE}'/dcov'}
@@ -61,7 +65,7 @@ fi
 
 # quantitative covariates:
 QCOVDIR=${QCOVDIR:-${DIR}'/covar/'${DATE}'/qcov'}
-QCOV=${QCOV:-'age.hgt.fa.01'}
+QCOV=${QCOV:-"NA"}
 QCOVFILE=${QCOVFILE:-${QCOVDIR}'/'${QCOV}'.tsv'}
 if [ ${QCOV} == 'NA' ] ; then
   echo "Not using any quantitative covariates"
@@ -80,22 +84,13 @@ else
   useRELCUT='T'
 fi
 
-# output:
+# grm:
 if [ ${useRELCUT} == 'T' ] ; then
-  OUTPUT=${OUTPUT:-${GENO}'_phe-'${PHE}'_dcov-'${DCOV}'_qcov-'${QCOV}'_rel-cutoff-'${RELCUT}}
+  INPUT_GRM_ALL=${DIR}'/grm/'${GENO}'_rel-cutoff-'${RELCUT}
+  INPUT_MGRM_LIST=${DIR}'/grm/'${GENO}'.score.ld.rel-cutoff-'${RELCUT}'.list.txt'
 else
-  OUTPUT=${OUTPUT:-${GENO}'_phe-'${PHE}'_dcov-'${DCOV}'_qcov-'${QCOV}}
+  INPUT_GRM_ALL=${DIR}'/grm/'${GENO}
+  INPUT_MGRM_LIST=${DIR}'/grm/'${GENO}'.score.ld.list.txt'
 fi
 
-# n:
-n=`grep ^"n" ${DIR}'/reml/'${DATE}'/'${OUTPUT}'.REML.'*'.hsq' | awk '{print $2}' | sort | uniq`
-
-echo -e "SNP\tA1\tA2\tfreq\tBETA\tSE\tP\tN" > ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma.ma'
-tail -n+2 ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma' | awk -F "\t" '$8!="inf"{print $0}' | awk -v n=${n} -F "\t" 'OFS=FS {print $2,$4,$5,$6,$7,$8,$9,n}' >> ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma.ma'
-
-# GENE / REGION BASED
-${magma} --bfile ${DIR}'/geno/'${GENO} \
-         --pval ${DIR}'/assoc/'${DATE}'/'${OUTPUT}'.loco.mlma.ma' N=${n} \
-         --gene-annot ${ANNOFILE} \
-         --out ${DIR}'/magma/'${DATE}'/'${OUTPUT}'.'${ANNO} \
-         --gene-settings fixed-permp=5000
+parallel --colsep '\t' --jobs 4 --env DIR,DATE,INPUT_GRM_ALL,INPUT_MGRM_LIST,PHEFILE,ARG_DCOVAR,ARG_QCOVAR,RELCUT,useRELCUT,GENO,PHE,DCOV,QCOV bash ${SCRIPT} :::: ${PAIRS}
